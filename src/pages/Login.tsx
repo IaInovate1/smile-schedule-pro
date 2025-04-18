@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,13 +11,31 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSupabaseConfigured, setIsSupabaseConfigured] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Verificar se o Supabase está configurado
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      setIsSupabaseConfigured(false);
+      toast.error("Configuração do Supabase incompleta", {
+        description: "As variáveis de ambiente VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY precisam ser configuradas."
+      });
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
+      if (!isSupabaseConfigured) {
+        throw new Error("Configuração do Supabase incompleta");
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -29,10 +47,10 @@ const Login = () => {
 
       toast.success("Login realizado com sucesso!");
       navigate("/appointments");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro no login:", error);
       toast.error("Erro ao fazer login", {
-        description: "Verifique suas credenciais e tente novamente."
+        description: error.message || "Verifique suas credenciais e tente novamente."
       });
     } finally {
       setIsLoading(false);
@@ -47,7 +65,9 @@ const Login = () => {
             Smile Schedule Pro
           </CardTitle>
           <CardDescription className="text-center">
-            Entre com suas credenciais para acessar o sistema
+            {isSupabaseConfigured 
+              ? "Entre com suas credenciais para acessar o sistema" 
+              : "Configuração do Supabase necessária"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -80,12 +100,20 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full bg-purple-600 hover:bg-purple-700" 
-              disabled={isLoading}
+              disabled={isLoading || !isSupabaseConfigured}
             >
               {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
+        {!isSupabaseConfigured && (
+          <CardFooter className="flex justify-center">
+            <p className="text-sm text-red-500">
+              É necessário configurar as variáveis de ambiente do Supabase.
+              Verifique a documentação e adicione as variáveis no painel do Supabase.
+            </p>
+          </CardFooter>
+        )}
       </Card>
     </div>
   );
