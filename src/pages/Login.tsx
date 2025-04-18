@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,24 +17,19 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // This is a placeholder for actual authentication logic
-      // In a real application, we would connect to Supabase here
+      // Placeholder for Supabase authentication
       console.log("Login attempt with:", { email, password });
       
-      // Simulate login success (remove in production)
-      setTimeout(() => {
-        toast({
-          title: "Login successful",
-          description: "Welcome back to Smile Schedule Pro!",
-        });
-        navigate("/appointments");
-      }, 1000);
+      toast.info("Preparando integração com Supabase...", {
+        description: "Conecte o Supabase para habilitar o login completo."
+      });
+      
+      // Future Supabase login will replace this
+      navigate("/appointments");
     } catch (error) {
-      console.error("Login failed:", error);
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
+      console.error("Login preparation error:", error);
+      toast.error("Erro ao preparar login", {
+        description: "Por favor, conecte o Supabase no botão verde."
       });
     } finally {
       setIsLoading(false);
@@ -49,7 +44,7 @@ const Login = () => {
             Smile Schedule Pro
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access your dashboard
+            Preparando integração com Supabase
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -61,7 +56,7 @@ const Login = () => {
               <Input
                 id="email"
                 type="email"
-                placeholder="doctor@example.com"
+                placeholder="dentista@exemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -69,7 +64,7 @@ const Login = () => {
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                Password
+                Senha
               </label>
               <Input
                 id="password"
@@ -84,13 +79,13 @@ const Login = () => {
               className="w-full bg-purple-600 hover:bg-purple-700" 
               disabled={isLoading}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "Preparando..." : "Preparar Login"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-gray-500">
-            * This is a demo. Real authentication requires Supabase integration.
+            * Conecte o Supabase para ativar o login completo
           </p>
         </CardFooter>
       </Card>
