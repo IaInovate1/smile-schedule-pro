@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,19 +18,21 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // Placeholder for Supabase authentication
-      console.log("Login attempt with:", { email, password });
-      
-      toast.info("Preparando integração com Supabase...", {
-        description: "Conecte o Supabase para habilitar o login completo."
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
-      
-      // Future Supabase login will replace this
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("Login realizado com sucesso!");
       navigate("/appointments");
     } catch (error) {
-      console.error("Login preparation error:", error);
-      toast.error("Erro ao preparar login", {
-        description: "Por favor, conecte o Supabase no botão verde."
+      console.error("Erro no login:", error);
+      toast.error("Erro ao fazer login", {
+        description: "Verifique suas credenciais e tente novamente."
       });
     } finally {
       setIsLoading(false);
@@ -44,7 +47,7 @@ const Login = () => {
             Smile Schedule Pro
           </CardTitle>
           <CardDescription className="text-center">
-            Preparando integração com Supabase
+            Entre com suas credenciais para acessar o sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -79,15 +82,10 @@ const Login = () => {
               className="w-full bg-purple-600 hover:bg-purple-700" 
               disabled={isLoading}
             >
-              {isLoading ? "Preparando..." : "Preparar Login"}
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-500">
-            * Conecte o Supabase para ativar o login completo
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );
